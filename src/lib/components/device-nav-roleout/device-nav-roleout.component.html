@@ -1,0 +1,37 @@
+  <span class="slider-panel">
+    <span class="flex flex-column">
+      <span class="flex jc-space-between v-align-center m2">
+        <span class="mat-mini-text ">{{ _deviceType }}</span>
+        <button
+          (click)="openEditor()"
+          aria-label="add" mat-mini-fab><mat-icon>add_circle</mat-icon></button>
+      </span>
+      <mat-divider></mat-divider>
+
+      @if (isLoadingResults) {
+        <span class="slider-loading-shade slider-panel">
+        <mat-spinner></mat-spinner>
+      </span>
+      }
+      <mat-selection-list
+        class="roleout-item"
+        [multiple]="false" [hideSingleSelectionIndicator]="true">
+        @for (item of list; track item.name) {
+          <mat-list-option (click)="navigate(item)">{{item.name}}</mat-list-option>
+        } @empty {
+          <mat-list-item>No devices</mat-list-item>
+        }
+      </mat-selection-list>
+    </span>
+  </span>
+
+  @if (device) {
+    <lib-device-roleout
+      [@openClose]="showSubmenu"
+      class="slider-component opacity-zero"
+      [device]="device"
+      [index]="index+1"
+      (deviceChanged)="deviceChanged($event)"
+    >
+    </lib-device-roleout>
+  }

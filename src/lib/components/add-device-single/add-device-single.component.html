@@ -1,0 +1,107 @@
+<form [formGroup]="addForm" class="update-form">
+
+  <span class="button-group">
+    <mat-form-field class="form-field">
+      <mat-label>Name</mat-label>
+      <input
+        matInput
+        id="name"
+        formControlName="name"
+      />
+      <span *ngIf="name.dirty || !name.untouched">
+      @if (name?.errors) {
+        <mat-error>
+          <span *ngIf="addForm.getError('required', 'name')">required</span>
+          Name is <strong>required</strong>
+        </mat-error>
+      }
+      </span>
+    </mat-form-field>
+
+    <mat-form-field class="form-field">
+      <mat-label>UID</mat-label>
+      <input
+        pattern="[\S]*"
+        id="uid"
+        matInput
+        formControlName="uid" />
+      <span *ngIf="uid.dirty || uid.untouched">
+         @if (uid?.errors) {
+           <mat-error>
+            <span *ngIf="addForm.getError('required', 'uid')">required</span>
+            <span *ngIf="addForm.getError('uidExists', 'uid')">exists!</span>
+            <span *ngIf="addForm.getError('uidInvalid', 'uid')">invalid!</span>
+          </mat-error>
+         }
+      </span>
+    </mat-form-field>
+
+    <mat-form-field class="form-field">
+      <mat-label>Type</mat-label>
+      <mat-select
+        matSelect
+        formControlName="type"
+        #type
+      >
+        <mat-option [value]="'dali'">Dali</mat-option>
+        <mat-option [value]="'power'">Power</mat-option>
+        <mat-option [value]="'water'">Water</mat-option>
+        <mat-option [value]="'door'">Door</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+  </span>
+
+  <span class="button-group">
+    <mat-form-field class="form-field">
+      <mat-label>Firmware</mat-label>
+      <mat-select
+        matSelect
+        formControlName="firmware"
+        #firmware
+      >
+        @if (_deviceType) {
+          <mat-option *ngFor="let firmware of deviceTypes.get(_deviceType)" [value]="firmware">{{firmware}}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="form-field">
+      <mat-label>State</mat-label>
+      <mat-select
+        matSelect
+        placeholder="Active"
+        formControlName="active"
+        #active
+      >
+        <mat-option [value]="false">inActive</mat-option>
+        <mat-option [value]="true">active</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </span>
+
+  <span class="button-group">
+    <mat-form-field class="form-field">
+      <mat-label>Company</mat-label>
+      <input
+        pattern="[\S]*"
+        id="companyUID"
+        matInput
+        formControlName="company" />
+    </mat-form-field>
+
+    <mat-form-field class="form-field">
+      <mat-label>Location</mat-label>
+      <mat-select
+        matSelect
+        formControlName="location"
+        #location
+      >
+        <mat-option *ngFor="let option of locations" [value]="option">{{option}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </span>
+
+</form>
+
+

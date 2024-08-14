@@ -1,0 +1,14 @@
+.attribute {
+  padding: .2em;
+  width: 8em;
+  background: #aabbaa;
+}
+
+.device {
+  background: #c5a1a1;
+}
+
+.value {
+  padding: .2em;
+  width: 8em;
+}

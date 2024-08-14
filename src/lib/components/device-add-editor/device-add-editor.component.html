@@ -1,0 +1,25 @@
+<lib-add-device-single
+  [deviceType]="deviceType"
+  [companyUID]="companyUID"
+>
+</lib-add-device-single>
+
+<span class="flex jc-space-around">
+  <span
+    class="buttons flex jc-space-evenly"
+    mat-dialog-actions>
+    <button
+      class="button"
+      mat-raised-button (click)="cancel()">Cancel</button>
+    <button
+      class="button"
+      (click)="addDevice()"
+      mat-raised-button
+      [disabled]="!valid"
+    >
+      Ok
+    </button>
+  </span>
+</span>
+
+

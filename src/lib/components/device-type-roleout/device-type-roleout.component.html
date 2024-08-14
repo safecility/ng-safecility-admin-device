@@ -1,0 +1,26 @@
+<div class="slider-panel">
+  <span class="flex flex-column full-width">
+    <span class="flex flex-column">
+      <span class="flex jc-space-between v-align-center m2">
+        <span class="mat-mini-text">Device Type</span>
+      </span>
+      <mat-divider></mat-divider>
+    </span>
+
+    <mat-selection-list class="full-width" [multiple]="false" [hideSingleSelectionIndicator]="true">
+      @for (item of deviceTypes; track item.name) {
+        <mat-list-option (click)="typeChange(item)">{{item.name}}</mat-list-option>
+      } @empty {
+        <mat-list-item>No options</mat-list-item>
+      }
+    </mat-selection-list>
+  </span>
+
+</div>
+@if (nav) {
+  <lib-device-nav-roleout
+    class="slider-component"
+    [index]="index+1"
+    [deviceType]="nav.uid">
+  </lib-device-nav-roleout>
+}
