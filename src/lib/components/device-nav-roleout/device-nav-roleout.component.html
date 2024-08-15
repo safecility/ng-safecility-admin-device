@@ -8,20 +8,26 @@
       </span>
       <mat-divider></mat-divider>
 
+      <span class="flex">
       @if (isLoadingResults) {
         <span class="slider-loading-shade slider-panel">
-        <mat-spinner></mat-spinner>
-      </span>
+          <mat-spinner></mat-spinner>
+        </span>
       }
-      <mat-selection-list
-        class="roleout-item"
-        [multiple]="false" [hideSingleSelectionIndicator]="true">
-        @for (item of list; track item.name) {
-          <mat-list-option (click)="navigate(item)">{{item.name}}</mat-list-option>
-        } @empty {
-          <mat-list-item>No devices</mat-list-item>
-        }
-      </mat-selection-list>
+        <mat-selection-list
+          class="roleout-item"
+          [multiple]="false" [hideSingleSelectionIndicator]="true">
+          @for (item of list; track item.name) {
+            <mat-list-option (click)="navigate(item)">{{item.name}}</mat-list-option>
+          } @empty {
+            <mat-list-item>
+              <span class="full-width">
+                {{isLoadingResults? 'loading...':  'No devices'}}
+              </span>
+            </mat-list-item>
+          }
+        </mat-selection-list>
+      </span>
     </span>
   </span>
 

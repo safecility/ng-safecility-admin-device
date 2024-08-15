@@ -12,11 +12,12 @@ import { map, Observable, of } from "rxjs";
 import { MatError, MatFormField, MatLabel } from "@angular/material/form-field";
 import { LocationSelectComponent } from "safecility-admin-company";
 import { MatInput } from "@angular/material/input";
-import { DeviceService } from "../../device.service";
 import { MatOption } from "@angular/material/core";
 import { MatSelect } from "@angular/material/select";
-import {NgForOf, NgIf} from "@angular/common";
-import {DeviceUpdate} from "../device-add-editor/device-add-editor.component";
+import { NgForOf, NgIf } from "@angular/common";
+
+import { DeviceService } from "../../device.service";
+import { DeviceUpdate } from "../device-add-editor/device-add-editor.component";
 
 interface FormState {
   current: any

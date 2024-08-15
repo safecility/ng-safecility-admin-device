@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy} from '@angular/core';
+import {Component, input, Input, OnDestroy} from '@angular/core';
 import { Subscription, timer} from "rxjs";
 import { DeviceService } from "../../device.service";
 import { MatDivider } from "@angular/material/divider";
@@ -39,29 +39,21 @@ export class DeviceNavRoleoutComponent implements SliderPanel, OnDestroy {
   isLoadingResults: boolean = true;
 
   @Input() set deviceType(deviceType: string) {
+    console.log("set deviceType", deviceType);
     if (this._deviceType === deviceType)
       return;
     this._deviceType = deviceType;
-    this.root = {name: deviceType, uid: deviceType, path: [
-        {name: "device", pathElement: "device"}, {name: deviceType, pathElement: deviceType}
-      ]}
-    console.log("set deviceType", deviceType);
-    this.deviceService.getDeviceList(deviceType).subscribe({
-      next: value => {
-        this.list = value.map( (x: NavigationItem) => {
-          return {
-            name: x.name, uid: x.uid,
-            path: x.path,
-          }
-        });
-        this.isLoadingResults = false;
-      },
-      error: err => {
-        console.error(err);
-      }
-    })
+    this.updateDevices();
   }
   _deviceType: string | undefined;
+
+  @Input() set company(company: string | undefined) {
+    if (this._company === company)
+      return;
+    this._company = company;
+    this.updateDevices();
+  }
+  _company: string | undefined;
 
   //set by deviceType
   root: NavigationItem | undefined;
@@ -97,6 +89,30 @@ export class DeviceNavRoleoutComponent implements SliderPanel, OnDestroy {
 
   ngOnDestroy(): void {
     this.sliderSubscription?.unsubscribe()
+  }
+
+  updateDevices() {
+    if (!this._deviceType)
+      return
+    this.root = {name: this._deviceType, uid: this._deviceType, path: [
+        {name: "device", pathElement: "device"}, {name: this._deviceType, pathElement: this._deviceType}
+      ]}
+
+    this.isLoadingResults = true;
+    this.deviceService.getDeviceList(this._deviceType, this._company).subscribe({
+      next: value => {
+        this.list = value.map( (x: NavigationItem) => {
+          return {
+            name: x.name, uid: x.uid,
+            path: x.path,
+          }
+        });
+        this.isLoadingResults = false;
+      },
+      error: err => {
+        console.error(err);
+      }
+    })
   }
 
   navigate(item: NavigationItem) {

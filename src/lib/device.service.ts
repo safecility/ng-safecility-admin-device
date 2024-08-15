@@ -36,7 +36,7 @@ export class DeviceService {
 
   constructor() { }
 
-  getDeviceList(deviceType: string) : Observable<Array<NavigationItem>> {
+  getDeviceList(deviceType: string, company?: string) : Observable<Array<NavigationItem>> {
     return this.devices.pipe(map( (a) => {
       if (!a)
         return []

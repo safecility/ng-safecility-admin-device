@@ -27,6 +27,7 @@ export class DeviceTypeRoleoutComponent implements SliderPanel {
         {name: "device", pathElement: "device"}, {name: "dali", pathElement: "dali"}
       ]}];
 
+  @Input() company: string | undefined;
   @Input() index = 1;
 
   nav: NavigationItem | undefined
