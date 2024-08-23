@@ -3,7 +3,7 @@
       <span class="flex jc-space-between v-align-center m2">
         <span class="mat-mini-text">{{ device.name }}</span>
         <span>
-          <button mat-mini-fab [matMenuTriggerFor]="menu" aria-label="open company actions menu">
+          <button mat-mini-fab [matMenuTriggerFor]="menu" aria-label="open device actions menu">
             <mat-icon>more_vert</mat-icon>
           </button>
           <mat-menu class="button-menu" #menu="matMenu">
@@ -29,6 +29,23 @@
           <span class="attribute">uid</span><span class="value">{{ device.uid }}</span>
         </span>
       </span>
+
+    @if (loading) {
+      <span class="text-center mt2">
+        loading...
+      </span>
+    } @else if (errors){
+      <span class="text-center mt2">device details missing</span>
+    } @else {
+      <span class="flex flex-column roleout-item">
+        <span class="flex jc-space-evenly v-align-center">
+          <span class="attribute">active</span><span class="value">{{ device.active }}</span>
+        </span>
+        <span class="flex jc-space-evenly v-align-center">
+          <span class="attribute">firmware</span><span class="value">{{ device.firmware }}</span>
+        </span>
+      </span>
+    }
   </span>
 }
 

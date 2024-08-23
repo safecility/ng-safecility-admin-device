@@ -1,4 +1,4 @@
-import {Component, input, Input, OnDestroy} from '@angular/core';
+import { Component, Input, OnDestroy} from '@angular/core';
 import { Subscription, timer} from "rxjs";
 import { DeviceService } from "../../device.service";
 import { MatDivider } from "@angular/material/divider";
@@ -6,8 +6,9 @@ import { MatIcon } from "@angular/material/icon";
 import { MatListItem, MatListOption, MatSelectionList } from "@angular/material/list";
 import { MatMiniFabButton } from "@angular/material/button";
 import {
+  fadeTrigger, MatchNavigationItem,
+  Resource,
   EditorService,
-  fadeTrigger,
   NavigationItem,
   SliderPanel,
   Sliders,
@@ -38,33 +39,38 @@ export class DeviceNavRoleoutComponent implements SliderPanel, OnDestroy {
 
   isLoadingResults: boolean = true;
 
-  @Input() set deviceType(deviceType: string) {
-    console.log("set deviceType", deviceType);
-    if (this._deviceType === deviceType)
-      return;
-    this._deviceType = deviceType;
-    this.updateDevices();
-  }
-  _deviceType: string | undefined;
+  @Input() parent: NavigationItem | undefined
 
-  @Input() set company(company: string | undefined) {
-    if (this._company === company)
+  @Input() company: string | undefined;
+
+  @Input() set setDeviceType(deviceType: string) {
+    console.log("set deviceType", deviceType);
+    if (this.deviceType === deviceType)
       return;
-    this._company = company;
+    this.deviceType = deviceType;
+    let path: Array<Resource> = [];
+    if (this.parent && this.parent.path) {
+      path = this.parent.path.map(x => x).concat({name: this.deviceType, uid: this.deviceType})
+    }
+    else {
+      path = [{name: "/", uid: "/"},
+        {name: "device", uid: "device"}, {name: this.deviceType, uid: this.deviceType}
+      ]
+    }
+    console.log("device nav root", path);
+    this.root = {name: this.deviceType, uid: this.deviceType, path}
     this.updateDevices();
   }
-  _company: string | undefined;
+  deviceType: string | undefined;
 
   //set by deviceType
   root: NavigationItem | undefined;
 
-  @Input() index: number = 2;
-
-  list: Array<NavigationItem> | undefined;
-
   showSubmenu = "closed";
 
-  device: NavigationItem | undefined;
+  deviceOptions: Array<NavigationItem> | undefined;
+
+  selectedDevice: NavigationItem | undefined;
 
   sliderSubscription: Subscription | undefined;
 
@@ -75,14 +81,9 @@ export class DeviceNavRoleoutComponent implements SliderPanel, OnDestroy {
     ) {
     this.sliderSubscription = this.sliderService.sliderNavigation(Sliders.NavSlider)?.subscribe({
       next: value => {
-        // if (!value || !value.path) {
-        //   this.clearDeviceDisplay();
-        //   return;
-        // }
-        // const index = value.path.length;
-        // if (index <= this.index) {
-        //   this.clearDeviceDisplay();
-        // }
+        const match = MatchNavigationItem(value, this.root);
+        if (match <=0)
+          this.reset();
       }
     })
   }
@@ -92,38 +93,44 @@ export class DeviceNavRoleoutComponent implements SliderPanel, OnDestroy {
   }
 
   updateDevices() {
-    if (!this._deviceType)
+    if (!this.deviceType)
       return
-    this.root = {name: this._deviceType, uid: this._deviceType, path: [
-        {name: "device", pathElement: "device"}, {name: this._deviceType, pathElement: this._deviceType}
-      ]}
 
     this.isLoadingResults = true;
-    this.deviceService.getDeviceList(this._deviceType, this._company).subscribe({
+    this.deviceService.getDeviceList(this.deviceType, this.company).subscribe({
       next: value => {
-        this.list = value.map( (x: NavigationItem) => {
+        this.deviceOptions = value.map( (x: NavigationItem) => {
+          let path: Array<Resource> = []
+          if (!this.root || !this.root.path) {
+            console.warn("we need root to setup slider navigation");
+          }
+          else {
+            path = this.root.path.map(x => x).concat({name: x.name, uid: x.uid});
+          }
           return {
             name: x.name, uid: x.uid,
-            path: x.path,
+            path,
           }
         });
-        this.isLoadingResults = false;
       },
       error: err => {
         console.error(err);
+      },
+      complete: () => {
+        this.isLoadingResults = false;
       }
     })
   }
 
-  navigate(item: NavigationItem) {
+  selectDevice(item: NavigationItem) {
+    this.selectedDevice = item;
     console.log("navigating to device", item);
     this.sliderService.updateSliderNavigation(Sliders.NavSlider, item);
-    this.device = item;
     this.showSubmenu = "open";
   }
 
   openEditor() {
-    this.editorService.setEditor({id: "device", state: "open", options: {type: this._deviceType}})
+    this.editorService.setEditor({id: "device", state: "open", options: {type: this.deviceType}})
   }
 
   deviceChanged($event: any) {
@@ -142,11 +149,11 @@ export class DeviceNavRoleoutComponent implements SliderPanel, OnDestroy {
     }
   }
 
-  private clearDeviceDisplay() {
+  private reset() {
     this.showSubmenu = "closed";
     timer(300).subscribe({
       next: _ => {
-        this.device = undefined;
+        this.selectedDevice = undefined;
       }
     })
   }

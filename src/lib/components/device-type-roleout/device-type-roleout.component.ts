@@ -2,7 +2,7 @@ import {Component, Input} from '@angular/core';
 import {MatDivider} from "@angular/material/divider";
 import {MatListItem, MatListOption, MatSelectionList} from "@angular/material/list";
 
-import {NavigationItem, SliderPanel, Sliders, SliderService} from "safecility-admin-services";
+import {MatchNavigationItem, NavigationItem, SliderPanel, Sliders, SliderService} from "safecility-admin-services";
 import {DeviceNavRoleoutComponent} from "../device-nav-roleout/device-nav-roleout.component";
 
 @Component({
@@ -20,39 +20,45 @@ import {DeviceNavRoleoutComponent} from "../device-nav-roleout/device-nav-roleou
 })
 export class DeviceTypeRoleoutComponent implements SliderPanel {
 
+  @Input() company: string | undefined;
   @Input() deviceTypes: Array<NavigationItem> = [
     {name:"power", uid:"power", path: [
-        {name: "device", pathElement: "device"}, {name: "power", pathElement: "power"}
+        {name: "power", uid: "power"}
       ]}, {name:"dali", uid:"dali", path: [
-        {name: "device", pathElement: "device"}, {name: "dali", pathElement: "dali"}
+        {name: "dali", uid: "dali"}
       ]}];
 
-  @Input() company: string | undefined;
-  @Input() index = 1;
+  @Input() set parent(parent: NavigationItem | undefined) {
+    if (!parent || ! parent.path)
+      return;
+    const path = parent.path.map(x=>x).concat({name: "Device Type", uid: "device-type"})
+    this.root = {name:"Device Type", uid:"device-type", path: path}
 
-  nav: NavigationItem | undefined
+    this.deviceTypes = this.deviceTypes.map(d => {
+      const devicePath = path.map(x => x).concat({name: d.name, uid: d.uid});
+      return {name: d.name, uid: d.uid, path: devicePath}
+    })
+  }
+  root: NavigationItem | undefined;
+
+  selectedDeviceType: NavigationItem | undefined
 
   constructor(private sliderService: SliderService,
   ) {
     this.sliderService.sliderNavigation(Sliders.NavSlider)?.subscribe({
-      next: (change: NavigationItem | undefined) => {
-        if (change && change.path) {
-          console.log("path change", change.path.length);
-          if (change.path.length <= this.index) {
-            this.nav = undefined;
-            return;
-          }
-          else if (change.path.length !== this.index + 1)
-            return;
-          }
-        if (!this.nav || !change || (change.uid !== this.nav.uid)) {
-          this.nav = change;
-        }
-      }
-    })
+      next: (value: NavigationItem | undefined) => {
+        const match = MatchNavigationItem(value, this.root);
+        if (match <=0)
+          this.reset();
+    }})
   }
 
-  typeChange(item: NavigationItem) {
+  reset() {
+    this.selectedDeviceType = undefined;
+  }
+
+  selectDeviceType(item: NavigationItem) {
+    this.selectedDeviceType = item;
     this.sliderService.updateSliderNavigation(Sliders.NavSlider, item);
   }
 

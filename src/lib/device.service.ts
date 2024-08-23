@@ -1,30 +1,35 @@
-import { Injectable } from '@angular/core';
-import {BehaviorSubject, Observable, map, timer, of, delay} from "rxjs";
+import { Inject, Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, map, timer, of, delay } from "rxjs";
 
 import { NavigationItem } from "safecility-admin-services";
+import { Device } from "./device.model";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
+import { deviceList } from "./device.mock";
+import { environmentToken } from "safecility-admin-services";
 
-const sourceDevices = [{name: "Safecility Dali 1", uid: "aa24kf88as7", deviceType: 'dali', path: [
-    {name: "device", pathElement: "device"}, {name: "dali", pathElement: "type"}, {name: "Safecility Dali 1", pathElement: "aa24kf88as7"}
-  ]},
-  {name: "Big Dali 1", uid: "aa24kf88as8", deviceType: 'dali', path: [
-      {name: "device", pathElement: "device"}, {name: "dali", pathElement: "type"}, {name: "Big Dali 1", pathElement: "aa24kf88as8"}
-    ] },
-  {name: "Small Dali 1", uid: "aa24kf88as9", deviceType: 'dali', path:  [
-      {name: "device", pathElement: "device"}, {name: "dali", pathElement: "type"}, {name: "Small Dali 1", pathElement: "aa24kf88as79"}
-    ]},
-  {name: "Safe Power 1", uid: "oa24kf88as7", deviceType: 'power', path: [
-      {name: "device", pathElement: "device"}, {name: "power", pathElement: "type"}, {name: "Safe Power 1", pathElement: "oa24kf88as7"}
-    ]},
-  {name: "Big Power 1", uid: "oa24kf88as8", deviceType: 'power', path: [
-      {name: "device", pathElement: "device"}, {name: "power", pathElement: "type"}, {name: "Big Power 1", pathElement: "oa24kf88as8"}
-    ] },
-  {name: "Small Power 1", uid: "oa24kf88as9", deviceType: 'power', path:  [
-      {name: "device", pathElement: "device"}, {name: "power", pathElement: "type"}, {name: "Small Power 1", pathElement: "oa24kf88as9"}
-    ]},
-]
+const deviceMap = new Map<string, Device>([
+  ["aa24kf88as7", {name: "Safecility Dali 1", uid: "aa24kf88as7", deviceType: 'dali', active: true}],
+  ["aa24kf88as8", {name: "Big Dali 1", uid: "aa24kf88as8", deviceType: 'dali', active: true}],
+  ["aa24kf88as9", {name: "Small Dali 1", uid: "aa24kf88as9", deviceType: 'dali', active: true}],
+  ["oa24kf88as7", {name: "Safe Power 1", uid: "oa24kf88as7", deviceType: 'power', active: true}],
+  ["oa24kf88as8", {name: "Big Power 1", uid: "oa24kf88as8", deviceType: 'power', active: true}],
+  ["oa24kf88as9", {name: "Small Power 1", uid: "oa24kf88as9", deviceType: 'power', active: true}],
+])
 
 interface typedNavigationItem extends NavigationItem {
   deviceType: string
+}
+
+const authHeaders = new HttpHeaders(
+  {
+    "Access-Control-Allow-Headers": "Origin, Authorization",
+  }
+)
+
+interface environment {
+  api: {
+    device: string
+  }
 }
 
 @Injectable({
@@ -32,16 +37,25 @@ interface typedNavigationItem extends NavigationItem {
 })
 export class DeviceService {
 
-  devices = new BehaviorSubject<Array<typedNavigationItem>>(sourceDevices)
+  devices = new BehaviorSubject<Array<typedNavigationItem>>(deviceList)
 
-  constructor() { }
+  constructor(
+    @Inject(environmentToken) private environment: environment,
+    private httpClient: HttpClient,
+  ) {
+  }
 
   getDeviceList(deviceType: string, company?: string) : Observable<Array<NavigationItem>> {
-    return this.devices.pipe(map( (a) => {
-      if (!a)
-        return []
-      return a.filter(u => !!u).filter(x => !x || x.deviceType === deviceType) as Array<NavigationItem>
-    }))
+    let deviceURL = `${this.environment.api.device}/device/list`;
+    if (deviceType)
+      deviceURL = deviceURL + "/" + deviceType;
+    return this.httpClient.get<Array<NavigationItem>>(deviceURL, {headers: authHeaders, withCredentials: true})
+  }
+
+  getDevice(uid: string) : Observable<Device | undefined> {
+    console.log("getting device", this.environment.api.device)
+    let deviceURL = `${this.environment.api.device}/device/uid/${uid}`;
+    return this.httpClient.get<Device>(deviceURL)
   }
 
   addDevice(device: any): Observable<boolean> {

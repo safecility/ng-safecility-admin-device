@@ -2,35 +2,46 @@ import { Injectable } from '@angular/core';
 import {BehaviorSubject, Observable, timer, map, of, delay} from "rxjs";
 
 import { NavigationItem } from "safecility-admin-services";
+import {Device} from "./device.model";
 
-const sourceDevices = [{name: "Safecility Dali 1", uid: "aa24kf88as7", company: 'safecility', deviceType: 'dali', path: [
-    {name: "device", pathElement: "device"}, {name: "dali", pathElement: "type"}, {name: "Safecility Dali 1", pathElement: "aa24kf88as7"}
+export const deviceList = [{name: "Safecility Dali 1", uid: "aa24kf88as7", company: 'safecility', deviceType: 'dali', path: [
+    {name: "device", uid: "device"}, {name: "dali", uid: "type"}, {name: "Safecility Dali 1", uid: "aa24kf88as7"}
   ]},
   {name: "Big Dali 1", uid: "aa24kf88as8", company: 'big-corp', deviceType: 'dali', path: [
-      {name: "device", pathElement: "device"}, {name: "dali", pathElement: "type"}, {name: "Big Dali 1", pathElement: "aa24kf88as8"}
+      {name: "device", uid: "device"}, {name: "dali", uid: "type"}, {name: "Big Dali 1", uid: "aa24kf88as8"}
     ] },
   {name: "Small Dali 1", uid: "aa24kf88as9", company: 'small-corp', deviceType: 'dali', path:  [
-      {name: "device", pathElement: "device"}, {name: "dali", pathElement: "type"}, {name: "Small Dali 1", pathElement: "aa24kf88as79"}
+      {name: "device", uid: "device"}, {name: "dali", uid: "type"}, {name: "Small Dali 1", uid: "aa24kf88as79"}
     ]},
   {name: "Mock Dali 1", uid: "aa24kf88as0", company: 'mock-corp', deviceType: 'dali', path:  [
-      {name: "device", pathElement: "device"}, {name: "dali", pathElement: "type"}, {name: "Mock Dali 1", pathElement: "aa24kf88as70"}
+      {name: "device", uid: "device"}, {name: "dali", uid: "type"}, {name: "Mock Dali 1", uid: "aa24kf88as70"}
     ]},
   {name: "Safe Power 1", uid: "oa24kf88as7", company: 'safecility', deviceType: 'power', path: [
-      {name: "device", pathElement: "device"}, {name: "power", pathElement: "type"}, {name: "Safe Power 1", pathElement: "oa24kf88as7"}
+      {name: "device", uid: "device"}, {name: "power", uid: "type"}, {name: "Safe Power 1", uid: "oa24kf88as7"}
     ]},
   {name: "Big Power 1", uid: "oa24kf88as8", company: 'big-corp', deviceType: 'power', path: [
-      {name: "device", pathElement: "device"}, {name: "power", pathElement: "type"}, {name: "Big Power 1", pathElement: "oa24kf88as8"}
+      {name: "device", uid: "device"}, {name: "power", uid: "type"}, {name: "Big Power 1", uid: "oa24kf88as8"}
     ] },
   {name: "Big Power 2", uid: "oa24kf88at8", company: 'big-corp', deviceType: 'power', path: [
-      {name: "device", pathElement: "device"}, {name: "power", pathElement: "type"}, {name: "Big Power 2", pathElement: "oa24kf88at8"}
+      {name: "device", uid: "device"}, {name: "power", uid: "type"}, {name: "Big Power 2", uid: "oa24kf88at8"}
     ] },
   {name: "Small Power 1", uid: "oa24kf88as9", company: 'small-corp', deviceType: 'power', path:  [
-      {name: "device", pathElement: "device"}, {name: "power", pathElement: "type"}, {name: "Small Power 1", pathElement: "oa24kf88as9"}
+      {name: "device", uid: "device"}, {name: "power", uid: "type"}, {name: "Small Power 1", uid: "oa24kf88as9"}
     ]},
   {name: "Mock Power 1", uid: "oa24kf88as0", company: 'mock-corp', deviceType: 'power', path:  [
-      {name: "device", pathElement: "device"}, {name: "power", pathElement: "type"}, {name: "Mock Power 1", pathElement: "oa24kf88as0"}
+      {name: "device", uid: "device"}, {name: "power", uid: "type"}, {name: "Mock Power 1", uid: "oa24kf88as0"}
     ]},
 ]
+
+const deviceMap = new Map<string, Device>([
+  ["aa24kf88as7", {name: "Safecility Dali 1", uid: "aa24kf88as7", deviceType: 'dali', active: true, firmware: 'daliB'}],
+  ["aa24kf88as8", {name: "Big Dali 1", uid: "aa24kf88as8", deviceType: 'dali', active: true, firmware: 'daliB'}],
+  ["aa24kf88as9", {name: "Small Dali 1", uid: "aa24kf88as9", deviceType: 'dali', active: true, firmware: 'daliA'}],
+  ["oa24kf88as7", {name: "Safe Power 1", uid: "oa24kf88as7", deviceType: 'power', active: true, firmware: 'milesightCT'}],
+  ["oa24kf88as8", {name: "Big Power 1", uid: "oa24kf88as8", deviceType: 'power', active: true, firmware: 'milesightCT'}],
+  ["oa24kf88as9", {name: "Small Power 1", uid: "oa24kf88as9", deviceType: 'power', active: true, firmware: 'milesightCT'}],
+  ["oa24kf88as0", {name: "Mock Power 1", uid: "oa24kf88as0", deviceType: 'power', active: true, firmware: 'milesightCT'}],
+])
 
 interface typedNavigationItem extends NavigationItem {
   deviceType: string
@@ -42,7 +53,7 @@ interface typedNavigationItem extends NavigationItem {
 })
 export class DeviceMock {
 
-  devices = new BehaviorSubject<Array<typedNavigationItem>>(sourceDevices)
+  devices = new BehaviorSubject<Array<typedNavigationItem>>(deviceList)
 
   constructor() { }
 
@@ -56,6 +67,10 @@ export class DeviceMock {
       }
       return devices as Array<NavigationItem>
     }))
+  }
+
+  getDevice(uid: string) : Observable<Device | undefined> {
+    return of(deviceMap.get(uid)).pipe(delay(300))
   }
 
   addDevice(device: any): Observable<boolean> {

@@ -9,7 +9,7 @@
 
     <mat-selection-list class="full-width" [multiple]="false" [hideSingleSelectionIndicator]="true">
       @for (item of deviceTypes; track item.name) {
-        <mat-list-option (click)="typeChange(item)">{{item.name}}</mat-list-option>
+        <mat-list-option (click)="selectDeviceType(item)">{{item.name}}</mat-list-option>
       } @empty {
         <mat-list-item>No options</mat-list-item>
       }
@@ -17,12 +17,12 @@
   </span>
 
 </div>
-@if (nav) {
+@if (selectedDeviceType) {
   <lib-device-nav-roleout
     class="slider-component"
-    [index]="index+1"
-    [deviceType]="nav.uid"
+    [parent]="root"
     [company]="company"
+    [setDeviceType]="selectedDeviceType.uid"
   >
   </lib-device-nav-roleout>
 }

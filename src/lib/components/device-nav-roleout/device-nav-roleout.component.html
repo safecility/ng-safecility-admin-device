@@ -1,7 +1,7 @@
   <span class="slider-panel">
     <span class="flex flex-column">
       <span class="flex jc-space-between v-align-center m2">
-        <span class="mat-mini-text ">{{ _deviceType }}</span>
+        <span class="mat-mini-text ">{{ deviceType }}</span>
         <button
           (click)="openEditor()"
           aria-label="add" mat-mini-fab><mat-icon>add_circle</mat-icon></button>
@@ -17,8 +17,8 @@
         <mat-selection-list
           class="roleout-item"
           [multiple]="false" [hideSingleSelectionIndicator]="true">
-          @for (item of list; track item.name) {
-            <mat-list-option (click)="navigate(item)">{{item.name}}</mat-list-option>
+          @for (item of deviceOptions; track item.name) {
+            <mat-list-option (click)="selectDevice(item)">{{item.name}}</mat-list-option>
           } @empty {
             <mat-list-item>
               <span class="full-width">
@@ -31,12 +31,12 @@
     </span>
   </span>
 
-  @if (device) {
+  @if (selectedDevice) {
     <lib-device-roleout
       [@openClose]="showSubmenu"
       class="slider-component opacity-zero"
-      [device]="device"
-      [index]="index+1"
+      [parent]="root"
+      [selectedDevice]="selectedDevice"
       (deviceChanged)="deviceChanged($event)"
     >
     </lib-device-roleout>
