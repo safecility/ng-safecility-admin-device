@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-import {AddDeviceSingleComponent} from "../add-device-single/add-device-single.component";
 import {MatButton} from "@angular/material/button";
 import {MatDialogActions} from "@angular/material/dialog";
 import {EditorService} from "safecility-admin-services";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {DeviceService} from "../../device.service";
-import {ActivatedRoute, Router} from "@angular/router";
+import {Router} from "@angular/router";
+import {EditDeviceComponent} from "../edit-device/edit-device.component";
+import {Device} from "../../device.model";
 
 export interface Version {
   firmwareName: string
@@ -26,6 +27,7 @@ export interface DeviceData {
 
 export interface DeviceUpdate {
   device: DeviceData;
+  update: boolean
   valid: boolean
 }
 
@@ -33,7 +35,7 @@ export interface DeviceUpdate {
   selector: 'lib-device-add-editor',
   standalone: true,
   imports: [
-    AddDeviceSingleComponent,
+    EditDeviceComponent,
     MatButton,
     MatDialogActions
   ],
@@ -42,9 +44,10 @@ export interface DeviceUpdate {
 })
 export class DeviceAddEditorComponent {
 
-  data: DeviceData | undefined;
+  editData: DeviceUpdate | undefined;
   valid: boolean = false;
 
+  device: Device | undefined;
   companyUID: string | undefined;
   deviceType: string | undefined;
 
@@ -56,15 +59,14 @@ export class DeviceAddEditorComponent {
   ) {
     const navigation = router.getCurrentNavigation();
     if (navigation) {
-      console.log("editor state", navigation.extras.state);
+      this.device =     navigation.extras?.state?.['device'];
       this.deviceType = navigation.extras?.state?.['type'];
       this.companyUID = navigation.extras?.state?.['companyUID'];
     }
   }
 
-  deviceEdited(c: DeviceUpdate | undefined) {
-    this.data = c?.device;
-    this.valid = !!c?.valid;
+  deviceEdited(du: DeviceUpdate | undefined) {
+    this.editData = du;
   }
 
   cancel() {
@@ -72,12 +74,25 @@ export class DeviceAddEditorComponent {
   }
 
   addDevice() {
-    if (this.data)
-      this.deviceService.addDevice(this.data).subscribe({
+    if (!this.editData?.valid)
+      return
+
+    console.log("data update", this.editData.device);
+
+    if (this.editData.update) {
+      this.deviceService.updateDevice(this.editData.device).subscribe({
+        next: value => {
+          this.snackBar.open("updated device", "", {duration: 3000})
+          this.editorService.closeEditor()
+        }
+      })
+    } else {
+      this.deviceService.addDevice(this.editData.device).subscribe({
         next: value => {
           this.snackBar.open("added device", "", {duration: 3000})
           this.editorService.closeEditor()
         }
       })
+    }
   }
 }

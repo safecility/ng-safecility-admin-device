@@ -1,6 +1,6 @@
-<form [formGroup]="addForm" class="update-form">
+<form [formGroup]="editForm" class="update-form">
 
-  <span class="button-group">
+  <span>
     <mat-form-field class="form-field">
       <mat-label>Name</mat-label>
       <input
@@ -11,8 +11,25 @@
       <span *ngIf="name.dirty || !name.untouched">
       @if (name?.errors) {
         <mat-error>
-          <span *ngIf="addForm.getError('required', 'name')">required</span>
+          <span *ngIf="editForm.getError('required', 'name')">required</span>
           Name is <strong>required</strong>
+        </mat-error>
+      }
+      </span>
+    </mat-form-field>
+
+    <mat-form-field class="form-field">
+      <mat-label>Tag</mat-label>
+      <input
+        matInput
+        id="tag"
+        formControlName="tag"
+      />
+      <span *ngIf="tag.dirty || !tag.untouched">
+      @if (tag?.errors) {
+        <mat-error>
+          <span *ngIf="editForm.getError('required', 'tag')">required</span>
+          Tag is <strong>required</strong>
         </mat-error>
       }
       </span>
@@ -28,9 +45,9 @@
       <span *ngIf="uid.dirty || uid.untouched">
          @if (uid?.errors) {
            <mat-error>
-            <span *ngIf="addForm.getError('required', 'uid')">required</span>
-            <span *ngIf="addForm.getError('uidExists', 'uid')">exists!</span>
-            <span *ngIf="addForm.getError('uidInvalid', 'uid')">invalid!</span>
+            <span *ngIf="editForm.getError('required', 'uid')">required</span>
+            <span *ngIf="editForm.getError('uidExists', 'uid')">exists!</span>
+            <span *ngIf="editForm.getError('uidInvalid', 'uid')">invalid!</span>
           </mat-error>
          }
       </span>
@@ -41,12 +58,9 @@
       <mat-select
         matSelect
         formControlName="type"
-        #type
       >
         <mat-option [value]="'dali'">Dali</mat-option>
         <mat-option [value]="'power'">Power</mat-option>
-        <mat-option [value]="'water'">Water</mat-option>
-        <mat-option [value]="'door'">Door</mat-option>
       </mat-select>
     </mat-form-field>
 
@@ -58,7 +72,6 @@
       <mat-select
         matSelect
         formControlName="firmware"
-        #firmware
       >
         @if (_deviceType) {
           <mat-option *ngFor="let firmware of deviceTypes.get(_deviceType)" [value]="firmware">{{firmware}}</mat-option>
@@ -83,25 +96,26 @@
   <span class="button-group">
     <mat-form-field class="form-field">
       <mat-label>Company</mat-label>
-      <input
-        pattern="[\S]*"
-        id="companyUID"
-        matInput
-        formControlName="company" />
+      <mat-select formControlName="companyUID">
+        <mat-option [value]="null"> --- </mat-option>
+        @for(company of companyList; track company.uid) {
+          <mat-option [value]="company.uid">{{company.name}}</mat-option>
+        }
+      </mat-select>
     </mat-form-field>
 
     <mat-form-field class="form-field">
       <mat-label>Location</mat-label>
       <mat-select
         matSelect
-        formControlName="location"
-        #location
+        formControlName="locationUID"
       >
-        <mat-option *ngFor="let option of locations" [value]="option">{{option}}</mat-option>
+        <mat-option [value]="null">---</mat-option>
+        @for (location of locationsList; track location.uid) {
+          <mat-option [value]="location.uid">{{location.name}}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
   </span>
 
 </form>
-
-

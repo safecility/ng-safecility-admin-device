@@ -3,21 +3,9 @@
       <span class="flex jc-space-between v-align-center m2">
         <span class="mat-mini-text">{{ device.name }}</span>
         <span>
-          <button mat-mini-fab [matMenuTriggerFor]="menu" aria-label="open device actions menu">
-            <mat-icon>more_vert</mat-icon>
+          <button mat-mini-fab (click)="openEditor()" aria-label="open device editor">
+            <mat-icon>edit</mat-icon>
           </button>
-          <mat-menu class="button-menu" #menu="matMenu">
-            <button mat-menu-item>
-              <mat-icon>edit</mat-icon>
-              <span>Edit</span>
-            </button>
-            <button
-              (click)="archiveDevice()"
-              mat-menu-item>
-              <mat-icon>archive</mat-icon>
-              <span>Archive</span>
-            </button>
-          </mat-menu>
         </span>
       </span>
       <mat-divider></mat-divider>
@@ -42,7 +30,7 @@
           <span class="attribute">active</span><span class="value">{{ device.active }}</span>
         </span>
         <span class="flex jc-space-evenly v-align-center">
-          <span class="attribute">firmware</span><span class="value">{{ device.firmware }}</span>
+          <span class="attribute">firmware</span><span class="value">{{ device.firmware?.name }} - {{ device.firmware?.version }}</span>
         </span>
       </span>
     }

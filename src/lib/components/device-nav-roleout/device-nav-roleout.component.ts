@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy} from '@angular/core';
 import { Subscription, timer} from "rxjs";
-import { DeviceService } from "../../device.service";
+import {DeviceService, listOptions} from "../../device.service";
 import { MatDivider } from "@angular/material/divider";
 import { MatIcon } from "@angular/material/icon";
 import { MatListItem, MatListOption, MatSelectionList } from "@angular/material/list";
@@ -16,6 +16,7 @@ import {
 } from "safecility-admin-services";
 import { DeviceRoleoutComponent} from "../device-roleout/device-roleout.component";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 
 
 @Component({
@@ -30,6 +31,9 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
     MatSelectionList,
     DeviceRoleoutComponent,
     MatProgressSpinner,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger,
   ],
   templateUrl: './device-nav-roleout.component.html',
   styleUrl: './device-nav-roleout.component.css',
@@ -41,7 +45,7 @@ export class DeviceNavRoleoutComponent implements SliderPanel, OnDestroy {
 
   @Input() parent: NavigationItem | undefined
 
-  @Input() company: string | undefined;
+  @Input() companyUID: string | undefined;
 
   @Input() set setDeviceType(deviceType: string) {
     console.log("set deviceType", deviceType);
@@ -97,7 +101,10 @@ export class DeviceNavRoleoutComponent implements SliderPanel, OnDestroy {
       return
 
     this.isLoadingResults = true;
-    this.deviceService.getDeviceList(this.deviceType, this.company).subscribe({
+    const options: listOptions = {showInactive: true}
+    if (this.companyUID)
+      options.companyUID = this.companyUID
+    this.deviceService.getResourceList(this.deviceType, options).subscribe({
       next: value => {
         this.deviceOptions = value.map( (x: NavigationItem) => {
           let path: Array<Resource> = []
@@ -136,16 +143,21 @@ export class DeviceNavRoleoutComponent implements SliderPanel, OnDestroy {
   deviceChanged($event: any) {
     if (!$event.item)
       return;
-    if ($event.action === 'archive') {
-      this.deviceService.archiveDevice($event.item?.uid).subscribe({
-        next: _ => {
-          this.isLoadingResults = false;
-          this.sliderService.updateSliderNavigation(Sliders.NavSlider, this.root);
-        },
-        error: err => {
-          console.error(err);
-        }
-      })
+    switch ($event.action) {
+      case 'archive':
+        this.deviceService.archiveDevice($event.item?.uid).subscribe({
+          next: _ => {
+            this.isLoadingResults = false;
+            this.sliderService.updateSliderNavigation(Sliders.NavSlider, this.root);
+          },
+          error: err => {
+            console.error(err);
+          }
+        })
+        break;
+      case 'toggle_active':
+
+        break;
     }
   }
 

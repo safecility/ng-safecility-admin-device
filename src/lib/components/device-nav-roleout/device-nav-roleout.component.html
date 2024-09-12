@@ -2,9 +2,33 @@
     <span class="flex flex-column">
       <span class="flex jc-space-between v-align-center m2">
         <span class="mat-mini-text ">{{ deviceType }}</span>
-        <button
-          (click)="openEditor()"
-          aria-label="add" mat-mini-fab><mat-icon>add_circle</mat-icon></button>
+
+        <span>
+          <button mat-mini-fab [matMenuTriggerFor]="menu" aria-label="open device actions menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu class="button-menu" #menu="matMenu">
+            <button mat-menu-item
+              (click)="openEditor()"
+              aria-label="add">
+              <mat-icon>add_circle</mat-icon>
+              <span>New</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon>edit</mat-icon>
+              <span>Edit List</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon>list_alt_add</mat-icon>
+              <span>Add Multiple</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon>toggle_on</mat-icon>
+              <span>Show inactive</span>
+            </button>
+          </mat-menu>
+        </span>
+
       </span>
       <mat-divider></mat-divider>
 

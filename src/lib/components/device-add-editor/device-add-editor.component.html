@@ -1,8 +1,10 @@
-<lib-add-device-single
+<lib-edit-device
+  [device]="device"
   [deviceType]="deviceType"
   [companyUID]="companyUID"
+  (valueChanged)="deviceEdited($event)"
 >
-</lib-add-device-single>
+</lib-edit-device>
 
 <span class="flex jc-space-around">
   <span
@@ -15,7 +17,7 @@
       class="button"
       (click)="addDevice()"
       mat-raised-button
-      [disabled]="!valid"
+      [disabled]="!(!this.editData || this.editData.valid)"
     >
       Ok
     </button>

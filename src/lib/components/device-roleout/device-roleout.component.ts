@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {NavigationItem, EditAction, SliderPanel, Resource} from "safecility-admin-services";
+import {NavigationItem, EditorService, EditAction, SliderPanel, Resource} from "safecility-admin-services";
 import {MatDivider} from "@angular/material/divider";
 import {MatIcon} from "@angular/material/icon";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
@@ -51,10 +51,13 @@ export class DeviceRoleoutComponent implements SliderPanel {
 
   @Output() deviceChanged = new EventEmitter<EditAction>();
 
-  constructor(private deviceService: DeviceService) {
+  constructor(
+    private deviceService: DeviceService,
+    private editorService: EditorService,
+    ) {
   }
 
-  getDevice(device: NavigationItem | undefined) {
+  getDevice(device: Resource | undefined) {
     this.device = device
     if (!device) {
       return
@@ -79,6 +82,10 @@ export class DeviceRoleoutComponent implements SliderPanel {
   //emit because we want to return to the list and update it
   archiveDevice() {
     this.deviceChanged.emit({action: "archive", item: this.device})
+  }
+
+  openEditor() {
+    this.editorService.setEditor({id: "device", state: "open", options: {device: this.device}})
   }
 
 }
